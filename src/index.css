@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --base:     #F2EDE3;
+  --base-alt: #EDE6D5;
+  --glass:    rgba(252,248,240,0.97);
+  --accent:   #C4622D;
+  --text:     #1C1510;
+  --text-mid: #3d2b1e;
+  --text-dim: #9e8060;
+  --border:   rgba(196,98,45,0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Responsive 2→1 column window grid */
+.window-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* F1Demo track + panel layout */
+.f1-track-row { display: flex; }
+.f1-stats-panel {
+  width: 108px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(196,98,45,0.15);
+}
+
+@media (max-width: 600px) {
+  .window-grid {
+    grid-template-columns: 1fr;
+  }
+  .f1-track-row {
+    flex-direction: column;
+  }
+  .f1-stats-panel {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(196,98,45,0.15);
+  }
+}
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  background: var(--base);
+  color: var(--text);
+  min-height: 100vh;
+}
