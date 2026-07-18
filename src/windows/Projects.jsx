@@ -177,7 +177,7 @@ export default function Projects() {
         </BrowserMock>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>
-            AI Recruiting Platform
+            NCAA Athlete Recruiting Engine
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 8 }}>
             <span style={{
