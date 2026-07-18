@@ -100,7 +100,7 @@ function SectionHeader({ kicker, title }) {
 const SOCIALS = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
     <Pill href="https://github.com/JaimeRmz">GitHub</Pill>
-    <Pill href="https://www.linkedin.com/in/jaimermz">LinkedIn</Pill>
+    <Pill href="https://www.linkedin.com/in/jaimenramirez/">LinkedIn</Pill>
     <Pill href="mailto:jaime@jrgkperformance.com">Email</Pill>
   </div>
 )
