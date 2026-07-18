@@ -101,7 +101,7 @@ const SOCIALS = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
     <Pill href="https://github.com/JaimeRmz">GitHub</Pill>
     <Pill href="https://www.linkedin.com/in/jaimenramirez/">LinkedIn</Pill>
-    <Pill href="mailto:jaime@jrgkperformance.com">Email</Pill>
+    <Pill href="mailto:jaimenramirez04@gmail.com">Email</Pill>
   </div>
 )
 
@@ -345,7 +345,7 @@ export default function App() {
                       flexDirection: 'column',
                       gap: 8,
                     }}>
-                      <TermLine cmd="$ echo $EMAIL" out="jaime@jrgkperformance.com" />
+                      <TermLine cmd="$ echo $EMAIL" out="jaimenramirez04@gmail.com" />
                       <TermLine cmd="$ git remote -v" out="github.com/JaimeRmz" />
                       <TermLine cmd="$ open --location" out="Houston, TX" />
                     </div>
