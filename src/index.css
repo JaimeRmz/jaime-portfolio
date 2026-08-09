@@ -1,63 +1,101 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   VOID design tokens
+   ------------------------------------------------------------
+   ACCENT SWAP: the accent lives entirely in the four vars below.
+   Either edit them here, or set an attribute on <html> to use one
+   of the presets further down:  <html data-accent="acid">
+   ============================================================ */
 :root {
-  --base:     #F2EDE3;
-  --base-alt: #EDE6D5;
-  --glass:    rgba(252,248,240,0.97);
-  --accent:   #C4622D;
-  --text:     #1C1510;
-  --text-mid: #3d2b1e;
-  --text-dim: #9e8060;
-  --border:   rgba(196,98,45,0.2);
+  --void:      #060607;
+  --ink:       #ececec;
+  --dim:       rgba(236, 236, 236, 0.45);
+  --faint:     rgba(236, 236, 236, 0.16);
+
+  /* derived text ramps */
+  --ash:       var(--dim);
+  --ash-dim:   rgba(236, 236, 236, 0.32);
+  --line:      var(--faint);
+
+  /* --- ACCENT (default: violet/blue pair) --- */
+  --accent:     #c9d6ff;
+  --accent-rgb: 201, 214, 255;
+  --accent-2:   #8b7bff;
+
+  /* fixed per-project hues — not part of the accent swap */
+  --violet:  #8b5cf6;
+  --blue:    #6ea3ff;
+  --magenta: #ff6fd8;
+  --acid:    #e4ff4f;
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Space Grotesk', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Accent presets — swap by setting data-accent on <html> */
+:root[data-accent='amber'] {
+  --accent:     #ffb454;
+  --accent-rgb: 255, 180, 84;
+  --accent-2:   #ff7a45;
+}
+:root[data-accent='cyan'] {
+  --accent:     #8fe9ff;
+  --accent-rgb: 143, 233, 255;
+  --accent-2:   #eafcff;
+}
+:root[data-accent='acid'] {
+  --accent:     #e4ff4f;
+  --accent-rgb: 228, 255, 79;
+  --accent-2:   #e4ff4f;
+}
 
-html, body {
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
   overflow-x: hidden;
-  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-}
-
-/* Responsive 2→1 column window grid */
-.window-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-/* F1Demo track + panel layout */
-.f1-track-row { display: flex; }
-.f1-stats-panel {
-  width: 108px;
-  flex-shrink: 0;
-  border-left: 1px solid rgba(196,98,45,0.15);
-}
-
-@media (max-width: 600px) {
-  .window-grid {
-    grid-template-columns: 1fr;
-  }
-  .f1-track-row {
-    flex-direction: column;
-  }
-  .f1-stats-panel {
-    width: 100%;
-    border-left: none;
-    border-top: 1px solid rgba(196,98,45,0.15);
-  }
 }
 
 body {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 500;
-  background: var(--base);
-  color: var(--text);
+  background: var(--void);
+  color: var(--ash);
+  font-family: var(--font-body);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--accent-2);
+  color: #050506;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

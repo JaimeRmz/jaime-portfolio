@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "d3": "^7.9.0",
+    "embla-carousel-auto-scroll": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.42.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

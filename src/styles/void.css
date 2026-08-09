@@ -1,0 +1,1113 @@
+/* ============================================================
+   VOID component layer
+   Everything Tailwind can't express cleanly (text-stroke, blend
+   modes, keyframe ambience) plus the scroll-reveal transitions.
+   Motion here is CSS-only — reveals are toggled by a class that
+   IntersectionObserver adds once. No GSAP, no animation deps.
+   ============================================================ */
+
+/* ---------- layout ---------- */
+.v-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 3;
+}
+@media (max-width: 760px) {
+  .v-wrap {
+    padding: 0 26px;
+  }
+}
+
+/* ---------- scroll reveals (IntersectionObserver adds .is-visible) ---------- */
+.v-reveal--rise {
+  opacity: 0;
+  transform: translateY(38px) scale(0.97);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.v-reveal--rise.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* dim → bright text reveal, fires once per element */
+.v-reveal--brighten {
+  color: var(--ash-dim);
+  transition: color 0.9s ease;
+}
+.v-reveal--brighten.is-visible {
+  color: var(--ink);
+}
+.v-reveal--brighten b {
+  color: inherit;
+  font-weight: inherit;
+}
+.v-reveal--brighten.is-visible b {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- ambient field ---------- */
+.v-nebula {
+  position: fixed;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(110px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.v-nebula--1 {
+  width: 50vw;
+  height: 50vw;
+  top: -14vh;
+  left: -12vw;
+  background: radial-gradient(circle, rgba(120, 120, 150, 0.14), transparent 70%);
+  animation: v-drift-1 50s ease-in-out infinite;
+}
+.v-nebula--2 {
+  width: 44vw;
+  height: 44vw;
+  bottom: -18vh;
+  right: -10vw;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
+  animation: v-drift-2 58s ease-in-out infinite;
+}
+.v-nebula--3 {
+  width: 30vw;
+  height: 30vw;
+  top: 55vh;
+  right: 14vw;
+  background: radial-gradient(circle, rgba(255, 111, 216, 0.06), transparent 70%);
+  animation: v-drift-3 64s ease-in-out infinite;
+}
+@keyframes v-drift-1 {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(5vw, 7vh); }
+}
+@keyframes v-drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-6vw, -5vh); }
+}
+@keyframes v-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-3vw, 4vh) scale(1.12); }
+}
+
+.v-grain {
+  position: fixed;
+  inset: -60%;
+  width: 220%;
+  height: 220%;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  animation: v-grain-shift 0.9s steps(10) infinite;
+}
+@keyframes v-grain-shift {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-3%, -6%); }
+  20%  { transform: translate(-8%, 3%); }
+  30%  { transform: translate(5%, -9%); }
+  40%  { transform: translate(-3%, 8%); }
+  50%  { transform: translate(-9%, -4%); }
+  60%  { transform: translate(4%, 0%); }
+  70%  { transform: translate(0%, 7%); }
+  80%  { transform: translate(2%, 11%); }
+  90%  { transform: translate(-7%, 4%); }
+  100% { transform: translate(0, 0); }
+}
+
+.v-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 81;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.14) 3px,
+    rgba(0, 0, 0, 0.14) 4px
+  );
+}
+
+.v-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: radial-gradient(ellipse 120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* ---------- ghost outline typography ---------- */
+.v-ghost {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(236, 236, 236, 0.14);
+  line-height: 0.85;
+  white-space: nowrap;
+}
+
+/* ---------- HUD chrome ---------- */
+.v-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 70;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 34px;
+  font-family: var(--font-mono);
+}
+.v-mark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.v-mark-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: v-blip 2.2s ease-in-out infinite;
+}
+.v-mark-sub {
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  color: #5c5c68;
+  margin-top: 5px;
+}
+@keyframes v-blip {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.72); }
+}
+.v-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.v-count {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #8a8a96;
+}
+.v-index-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.v-index-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+@media (max-width: 760px) {
+  .v-topbar { padding: 18px 20px; }
+  .v-mark-sub, .v-count { display: none; }
+}
+
+.v-coord {
+  position: fixed;
+  bottom: 46px;
+  left: 34px;
+  z-index: 70;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #5c5c68;
+  letter-spacing: 0.5px;
+  line-height: 1.7;
+  pointer-events: none;
+}
+.v-coord b {
+  color: var(--accent);
+  font-weight: 400;
+}
+.v-coord-loc {
+  color: #7c7c88;
+}
+@media (max-width: 760px) {
+  .v-coord { display: none; }
+}
+
+.v-ticker {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 65;
+  height: 32px;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  background: rgba(3, 3, 4, 0.5);
+  backdrop-filter: blur(4px);
+}
+.v-ticker-track {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  animation: v-ticker-move 34s linear infinite;
+}
+.v-ticker-track span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--faint);
+  padding: 0 8px;
+}
+@keyframes v-ticker-move {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ---------- index slide-in panel ---------- */
+.v-index-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 150;
+  width: min(92vw, 400px);
+  background: rgba(6, 6, 7, 0.88);
+  backdrop-filter: blur(18px);
+  border-left: 1px solid var(--faint);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(102%);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.v-index-panel.is-open {
+  transform: translateX(0);
+}
+.v-index-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--faint);
+}
+.v-index-head span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.v-index-head button {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ash);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.v-index-head button:hover {
+  color: var(--ink);
+}
+.v-index-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 26px;
+  border: none;
+  border-bottom: 1px solid rgba(236, 236, 236, 0.06);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.v-index-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.v-index-idx {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.v-index-swatch {
+  width: 44px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  opacity: 0.35;
+}
+.v-index-text {
+  min-width: 0;
+}
+.v-index-title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v-index-meta {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.v-index-arrow {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.v-index-row:hover .v-index-arrow {
+  opacity: 0.7;
+}
+.v-index-foot {
+  padding: 16px 26px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.v-index-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 149;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.v-index-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- hero ---------- */
+.v-intro {
+  position: relative;
+  /* padding-top/bottom only — this element also carries .v-wrap, and a
+     `padding` shorthand here would reset .v-wrap's horizontal gutter to 0 */
+  padding-top: 150px;
+  padding-bottom: 90px;
+  overflow: hidden;
+}
+.v-intro .v-ghost {
+  top: -4vh;
+  left: -1vw;
+  font-size: 15vw;
+}
+.v-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.v-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(46px, 8.4vw, 116px);
+  line-height: 0.94;
+  letter-spacing: -2px;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.v-name em {
+  font-style: normal;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.v-subtitle {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--ash);
+  margin-bottom: 44px;
+}
+.v-bio {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 2.6vw, 32px);
+  line-height: 1.42;
+  letter-spacing: -0.3px;
+  max-width: 900px;
+  margin-bottom: 44px;
+}
+.v-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 34px;
+}
+.v-status-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: v-blip 2s ease-in-out infinite;
+}
+.v-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.v-pill {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 11px 20px;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  color: var(--ash);
+  transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+.v-pill:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.2);
+}
+
+/* ---------- tech carousel (embla) ---------- */
+.v-tech {
+  position: relative;
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.v-tech-viewport {
+  overflow: hidden;
+}
+.v-tech-container {
+  display: flex;
+  align-items: center;
+  backface-visibility: hidden;
+}
+.v-tech-slide {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ash);
+  padding: 0 30px;
+  border-right: 1px solid var(--line);
+  transition: color 0.25s ease;
+}
+.v-tech-slide:hover {
+  color: var(--ink);
+}
+.v-tech-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+  /* logos are authored for light backgrounds — lift them off the void a touch */
+  opacity: 0.86;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+.v-tech-slide:hover .v-tech-logo {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px var(--tc, var(--accent)));
+}
+/* fallback chip, shown only if a logo fails to load */
+.v-tech-slide i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--tc, var(--accent));
+  box-shadow: 0 0 8px var(--tc, var(--accent));
+}
+
+/* ---------- section label ---------- */
+.v-section-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 60px;
+  padding-top: 110px;
+}
+.v-section-label .v-ghost {
+  top: 50px;
+  left: -2vw;
+  font-size: 11vw;
+}
+.v-section-label .v-n {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+.v-section-label h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 34px;
+  color: var(--ink);
+}
+.v-section-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line), transparent);
+}
+
+/* ---------- projects ---------- */
+.v-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+  padding-bottom: 150px;
+}
+.v-proj {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  position: relative;
+}
+.v-proj--flip {
+  grid-template-columns: 0.85fr 1.15fr;
+}
+.v-proj--flip .v-proj-visual {
+  order: 2;
+}
+.v-proj--flip .v-proj-panel {
+  order: 1;
+  margin: 0 0 0 -60px;
+}
+.v-proj-visual {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.v-proj-panel {
+  position: relative;
+  z-index: 4;
+  margin: 0 -60px 0 0;
+}
+@media (max-width: 900px) {
+  .v-projects { gap: 90px; }
+  .v-proj,
+  .v-proj--flip {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+  .v-proj .v-proj-visual,
+  .v-proj--flip .v-proj-visual { order: 1; }
+  .v-proj .v-proj-panel,
+  .v-proj--flip .v-proj-panel { order: 2; margin: 0; }
+}
+
+.v-proj-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  z-index: 4;
+}
+
+/* translucent "terminal" glass panel — shared by projects + contact */
+.v-panel {
+  background: rgba(10, 10, 14, 0.55);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  padding: 34px 36px;
+}
+@media (max-width: 900px) {
+  .v-panel { padding: 26px 24px; }
+}
+
+.v-proj-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 2.5px;
+  color: var(--pc, var(--accent));
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.v-proj-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 2.6vw, 36px);
+  color: var(--ink);
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+.v-proj-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: #8a8a96;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+.v-proj-desc {
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.v-proj-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.v-proj-tags span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: #8a8a96;
+  border: 1px solid var(--line);
+  padding: 5px 10px;
+  text-transform: uppercase;
+}
+.v-proj-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.v-launch {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 11px 20px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.v-launch:hover {
+  border-color: var(--pc, var(--accent));
+  box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.25);
+}
+.v-stat-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--pc, var(--accent));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 8px 13px;
+}
+
+/* ---------- project media (screenshot slot) ---------- */
+.v-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, rgba(var(--accent-rgb), 0.08), transparent 65%), #08080b;
+}
+/* live screenshots keep the 4/3 box but never collapse below the site hero */
+.v-media--live {
+  min-height: 220px;
+}
+/* custom components size themselves — forcing 4/3 would crop or squash them */
+.v-media--custom {
+  aspect-ratio: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+}
+.v-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+/* live-preview skeleton — pulses on the dim/faint ramp until onLoad */
+.v-media-skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(236, 236, 236, 0.06), rgba(236, 236, 236, 0.02));
+  border: 1px solid var(--faint);
+  animation: v-skeleton-pulse 1.5s ease-in-out infinite;
+}
+.v-media-skeleton::after {
+  content: 'LOADING PREVIEW';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 2.5px;
+  color: var(--dim);
+}
+@keyframes v-skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+.v-media-shot {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.v-media-shot.is-loaded {
+  opacity: 1;
+}
+
+/* ---------- phone mockup (MacroSetDemo) ---------- */
+.v-phone {
+  position: relative;
+  width: 218px;
+  height: 400px;
+  flex-shrink: 0;
+  border-radius: 30px;
+  border: 1px solid rgba(236, 236, 236, 0.14);
+  background: var(--void);
+  box-shadow: 0 40px 90px -24px rgba(var(--accent-rgb), 0.28);
+  padding: 22px 16px 16px;
+  overflow: hidden;
+}
+/* notch */
+.v-phone::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(236, 236, 236, 0.16);
+}
+.v-phone-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  margin-bottom: 12px;
+}
+.v-phone-ring {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.v-ring-bg {
+  fill: none;
+  stroke: rgba(236, 236, 236, 0.08);
+  stroke-width: 8;
+}
+.v-ring-fg {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.6));
+}
+.v-ring-value {
+  font-family: var(--font-mono);
+  fill: var(--ink);
+  text-anchor: middle;
+  font-size: 14px;
+}
+.v-ring-unit {
+  font-family: var(--font-mono);
+  fill: rgba(236, 236, 236, 0.4);
+  text-anchor: middle;
+  font-size: 6.5px;
+}
+.v-macro-bars {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.v-macro-bars > div {
+  flex: 1;
+}
+.v-macro-lbl {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  margin-bottom: 5px;
+  text-align: center;
+}
+.v-macro-track {
+  height: 4px;
+  background: rgba(236, 236, 236, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.v-macro-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+.v-phone-shutter {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  pointer-events: none;
+  z-index: 12;
+}
+.v-phone-camera {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--accent-rgb), 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--accent);
+  background: rgba(10, 10, 14, 0.6);
+}
+.v-phone-ripple {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  pointer-events: none;
+}
+/* fixed-height slot so the thumbnail entering never pushes the ring down */
+.v-thumb-slot {
+  height: 72px;
+}
+.v-thumb {
+  position: relative;
+  height: 62px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(236, 236, 236, 0.12);
+  background: linear-gradient(135deg, #3a2a1e, #1d2a20 60%, #12161c);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+}
+.v-thumb-label {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 1.5px;
+  color: var(--ink);
+}
+.v-thumb-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 8px var(--accent);
+}
+.v-thumb-check {
+  margin-left: auto;
+  font-size: 13px;
+  color: #3ecf8e;
+}
+.v-toast {
+  position: absolute;
+  bottom: 66px;
+  left: 50%;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 10, 14, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+/* ---------- F1Demo layout support ----------
+   F1Demo.jsx (src/components/void/) is carried over from v1 and still relies
+   on these two class names. They lived in the old index.css that the void
+   token rewrite replaced, so they are restored here instead. */
+.f1-track-row {
+  display: flex;
+  width: 100%;
+}
+.f1-stats-panel {
+  width: 108px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(236, 236, 236, 0.12);
+}
+@media (max-width: 600px) {
+  .f1-track-row {
+    flex-direction: column;
+  }
+  .f1-stats-panel {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(236, 236, 236, 0.12);
+  }
+}
+.v-media-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px dashed rgba(236, 236, 236, 0.12);
+  font-family: var(--font-mono);
+  text-align: center;
+  padding: 20px;
+}
+.v-media-placeholder .v-media-icon {
+  font-size: 20px;
+  color: var(--pc, var(--accent));
+  opacity: 0.7;
+}
+.v-media-placeholder .v-media-label {
+  font-size: 10.5px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.v-media-placeholder .v-media-hint {
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: rgba(236, 236, 236, 0.28);
+}
+
+/* ---------- contact ---------- */
+.v-contact {
+  position: relative;
+  /* longhand for the same reason as .v-intro — see note there */
+  padding-bottom: 160px;
+}
+.v-contact .v-ghost {
+  top: 60px;
+  left: -2vw;
+  font-size: 11vw;
+}
+.v-contact-lead {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 30px;
+}
+.v-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: start;
+}
+@media (max-width: 820px) {
+  .v-contact-grid { grid-template-columns: 1fr; gap: 28px; }
+}
+.v-contact-grid p {
+  font-size: 14.5px;
+  line-height: 1.75;
+  margin-bottom: 22px;
+}
+.v-terminal {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 2.1;
+  margin-bottom: 22px;
+  padding: 20px 22px;
+}
+.v-terminal .v-cmd { color: #7a7a8a; }
+.v-terminal .v-val { color: var(--ink); }
+.v-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.v-form input,
+.v-form textarea {
+  background: rgba(10, 10, 14, 0.55);
+  border: 1px solid var(--line);
+  padding: 13px 15px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--ink);
+  outline: none;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.25s ease;
+}
+.v-form input::placeholder,
+.v-form textarea::placeholder {
+  color: #5a5a68;
+}
+.v-form input:focus,
+.v-form textarea:focus {
+  border-color: var(--accent);
+}
+.v-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.v-send {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #08080a;
+  font-weight: 600;
+  padding: 12px 26px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+}
+.v-footer {
+  text-align: center;
+  padding: 0 0 70px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--faint);
+}

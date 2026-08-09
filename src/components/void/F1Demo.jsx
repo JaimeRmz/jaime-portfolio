@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useIsMobile } from '../hooks/useIsMobile'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 const DRIVERS = [
   { id: 'LEC', name: 'Leclerc', color: '#e8002d', r: 13, offset: 0.0  },
@@ -70,7 +70,7 @@ export default function F1Demo() {
     <div className="f1-demo" style={{
       display:       'flex',
       flexDirection: 'column',
-      background:    '#1C1510',
+      background:    'var(--void)',
       borderRadius:  7,
       overflow:      'hidden',
       position:      'relative',
@@ -110,31 +110,33 @@ export default function F1Demo() {
             </filter>
             <filter id="track-glow" x="-15%" y="-15%" width="130%" height="130%">
               <feGaussianBlur stdDeviation="5" result="blur" />
-              <feFlood floodColor="rgb(196,98,45)" floodOpacity="0.55" result="color" />
+              {/* flood-color must go through `style` — var() does not resolve
+                  reliably in SVG presentation attributes */}
+              <feFlood style={{ floodColor: 'var(--accent)' }} floodOpacity="0.55" result="color" />
               <feComposite in="color" in2="blur" operator="in" result="glow" />
               <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
           </defs>
 
           {/* Track: warm glow halo → glowing white main line → amber accent dashes */}
-          <path d={MOTION_D} fill="none" stroke="rgba(196,98,45,0.14)" strokeWidth="28" strokeLinejoin="round" strokeLinecap="round" />
-          <path d={MOTION_D} fill="none" stroke="rgba(255,255,255,0.82)" strokeWidth="5.5" strokeLinejoin="round" strokeLinecap="round" filter="url(#track-glow)" />
-          <path d={MOTION_D} fill="none" stroke="rgba(196,98,45,0.44)"  strokeWidth="2"   strokeLinejoin="round" strokeLinecap="round" strokeDasharray="22 88" />
+          <path d={MOTION_D} fill="none" style={{ stroke: 'rgba(var(--accent-rgb),0.14)' }} strokeWidth="28" strokeLinejoin="round" strokeLinecap="round" />
+          <path d={MOTION_D} fill="none" style={{ stroke: 'var(--ink)', strokeOpacity: 0.82 }} strokeWidth="5.5" strokeLinejoin="round" strokeLinecap="round" filter="url(#track-glow)" />
+          <path d={MOTION_D} fill="none" style={{ stroke: 'rgba(var(--accent-rgb),0.44)' }}  strokeWidth="2"   strokeLinejoin="round" strokeLinecap="round" strokeDasharray="22 88" />
 
           {/* Finish line — checkered stripe at MOTION_D start/end (Monaco pit straight) */}
-          <line x1="1026" y1="137" x2="1056" y2="151" stroke="rgba(240,235,225,0.95)" strokeWidth="7" strokeLinecap="square" />
-          <line x1="1026" y1="137" x2="1056" y2="151" stroke="#1C1510" strokeWidth="7" strokeLinecap="square" strokeDasharray="5 5" strokeDashoffset="5" />
-          <text x="1062" y="148" fontSize="9" fill="rgba(255,255,255,0.58)" fontFamily="monospace">S/F</text>
+          <line x1="1026" y1="137" x2="1056" y2="151" style={{ stroke: 'var(--ink)', strokeOpacity: 0.95 }} strokeWidth="7" strokeLinecap="square" />
+          <line x1="1026" y1="137" x2="1056" y2="151" style={{ stroke: 'var(--void)' }} strokeWidth="7" strokeLinecap="square" strokeDasharray="5 5" strokeDashoffset="5" />
+          <text x="1062" y="148" fontSize="9" style={{ fill: 'var(--dim)' }} fontFamily="monospace">S/F</text>
 
           {/* Corner labels */}
-          <text x="840"  y="200" fontSize="10" fill="rgba(196,98,45,0.52)" fontFamily="monospace">S.D.</text>
-          <text x="280"  y="22"  fontSize="10" fill="rgba(196,98,45,0.52)" fontFamily="monospace">CASINO</text>
-          <text x="10"   y="436" fontSize="10" fill="rgba(196,98,45,0.52)" fontFamily="monospace">LOEWS</text>
-          <text x="38"   y="372" fontSize="10" fill="rgba(196,98,45,0.52)" fontFamily="monospace">TUNNEL</text>
-          <text x="718"  y="325" fontSize="10" fill="rgba(196,98,45,0.52)" fontFamily="monospace">PISCINE</text>
+          <text x="840"  y="200" fontSize="10" style={{ fill: 'rgba(var(--accent-rgb),0.52)' }} fontFamily="monospace">S.D.</text>
+          <text x="280"  y="22"  fontSize="10" style={{ fill: 'rgba(var(--accent-rgb),0.52)' }} fontFamily="monospace">CASINO</text>
+          <text x="10"   y="436" fontSize="10" style={{ fill: 'rgba(var(--accent-rgb),0.52)' }} fontFamily="monospace">LOEWS</text>
+          <text x="38"   y="372" fontSize="10" style={{ fill: 'rgba(var(--accent-rgb),0.52)' }} fontFamily="monospace">TUNNEL</text>
+          <text x="718"  y="325" fontSize="10" style={{ fill: 'rgba(var(--accent-rgb),0.52)' }} fontFamily="monospace">PISCINE</text>
 
           {/* Circuit label */}
-          <text x="580" y="478" fontSize="12" fill="rgba(196,98,45,0.38)" textAnchor="middle" letterSpacing="4" fontFamily="monospace">MONACO 2024</text>
+          <text x="580" y="478" fontSize="12" style={{ fill: 'rgba(var(--accent-rgb),0.38)' }} textAnchor="middle" letterSpacing="4" fontFamily="monospace">MONACO 2024</text>
 
           {/* Non-LEC cars (lower z-order) */}
           {DRIVERS.slice(1).reverse().map(d => (
@@ -159,26 +161,26 @@ export default function F1Demo() {
           flexDirection: 'column',
           gap:           3,
           zIndex:        2,
-          color:         '#c8b89a',
+          color:         'var(--dim)',
           fontSize:      fs(8),
         }}>
           {/* Header */}
-          <div style={{ color: '#C4622D', fontSize: fs(7.5), fontWeight: 700, letterSpacing: 1.5, lineHeight: 1 }}>
+          <div style={{ color: 'var(--accent)', fontSize: fs(7.5), fontWeight: 700, letterSpacing: 1.5, lineHeight: 1 }}>
             MONACO GP 2024
           </div>
 
           {/* Lap counter */}
           <div style={{ lineHeight: 1, marginBottom: 1 }}>
-            <span style={{ fontSize: fs(11), fontWeight: 700, color: '#e8c89a' }}>LAP </span>
-            <span style={{ fontSize: fs(11), fontWeight: 700, color: '#C4622D' }}>{String(lap).padStart(2, '0')}</span>
-            <span style={{ fontSize: fs(7), color: 'rgba(196,98,45,0.4)' }}>/78</span>
+            <span style={{ fontSize: fs(11), fontWeight: 700, color: 'var(--ink)' }}>LAP </span>
+            <span style={{ fontSize: fs(11), fontWeight: 700, color: 'var(--accent)' }}>{String(lap).padStart(2, '0')}</span>
+            <span style={{ fontSize: fs(7), color: 'rgba(var(--accent-rgb),0.4)' }}>/78</span>
           </div>
 
           {/* Standings */}
-          <div style={{ color: 'rgba(196,98,45,0.32)', fontSize: fs(6), letterSpacing: 1, marginBottom: 1 }}>── STANDINGS ──</div>
+          <div style={{ color: 'rgba(var(--accent-rgb),0.32)', fontSize: fs(6), letterSpacing: 1, marginBottom: 1 }}>── STANDINGS ──</div>
           {DRIVERS.map((d, i) => (
             <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <span style={{ color: 'rgba(196,98,45,0.38)', width: 8, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+              <span style={{ color: 'rgba(var(--accent-rgb),0.38)', width: 8, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
               <div style={{
                 width: i === 0 ? 7 : 5, height: i === 0 ? 7 : 5, borderRadius: '50%',
                 background: d.color, boxShadow: `0 0 ${i === 0 ? 7 : 4}px ${d.color}`,
@@ -186,15 +188,15 @@ export default function F1Demo() {
               }} />
               <span style={{ fontSize: fs(7.5), flex: 1 }}>{d.id}</span>
               {i === 0
-                ? <span style={{ fontSize: fs(6), color: '#C4622D', background: 'rgba(196,98,45,0.15)', padding: '1px 3px', borderRadius: 2 }}>P1</span>
-                : <span style={{ fontSize: fs(6), color: 'rgba(196,98,45,0.42)' }}>+{(GAPS[i-1].base + prog * GAPS[i-1].growth).toFixed(1)}s</span>
+                ? <span style={{ fontSize: fs(6), color: 'var(--accent)', background: 'rgba(var(--accent-rgb),0.15)', padding: '1px 3px', borderRadius: 2 }}>P1</span>
+                : <span style={{ fontSize: fs(6), color: 'rgba(var(--accent-rgb),0.42)' }}>+{(GAPS[i-1].base + prog * GAPS[i-1].growth).toFixed(1)}s</span>
               }
             </div>
           ))}
 
           {/* Win probability bars */}
-          <div style={{ borderTop: '1px solid rgba(196,98,45,0.1)', paddingTop: 4, marginTop: 2 }}>
-            <div style={{ color: 'rgba(196,98,45,0.32)', fontSize: fs(6), letterSpacing: 1, marginBottom: 3 }}>WIN PROB</div>
+          <div style={{ borderTop: '1px solid rgba(var(--accent-rgb),0.1)', paddingTop: 4, marginTop: 2 }}>
+            <div style={{ color: 'rgba(var(--accent-rgb),0.32)', fontSize: fs(6), letterSpacing: 1, marginBottom: 3 }}>WIN PROB</div>
             {[
               { id: 'LEC', color: '#e8002d', prob: lecProb  },
               { id: 'PIA', color: '#ff8000', prob: piaProb  },
@@ -205,7 +207,7 @@ export default function F1Demo() {
                   <span style={{ fontSize: fs(6.5) }}>{id}</span>
                   <span style={{ fontSize: fs(6.5), color }}>{prob}%</span>
                 </div>
-                <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: 3, background: 'rgba(236,236,236,0.08)', borderRadius: 2, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', width: `${prob}%`, background: color,
                     borderRadius: 2, transition: 'width 1.6s ease',
@@ -217,14 +219,14 @@ export default function F1Demo() {
           </div>
 
           {/* Model accuracy */}
-          <div style={{ borderTop: '1px solid rgba(196,98,45,0.1)', paddingTop: 4, marginTop: 1 }}>
-            <div style={{ color: 'rgba(196,98,45,0.32)', fontSize: fs(6), letterSpacing: 1, marginBottom: 3 }}>MODEL PREDICTED</div>
+          <div style={{ borderTop: '1px solid rgba(var(--accent-rgb),0.1)', paddingTop: 4, marginTop: 1 }}>
+            <div style={{ color: 'rgba(var(--accent-rgb),0.32)', fontSize: fs(6), letterSpacing: 1, marginBottom: 3 }}>MODEL PREDICTED</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
               <span style={{ color: '#00c96b', fontSize: fs(10), lineHeight: 1 }}>✓</span>
               <span style={{ color: '#00c96b', fontSize: fs(7.5) }}>LEC WIN</span>
             </div>
-            <div style={{ color: '#C4622D', fontSize: fs(8), fontWeight: 700, marginBottom: 1 }}>94.2% confidence</div>
-            <div style={{ color: 'rgba(196,98,45,0.32)', fontSize: fs(6) }}>Pre-race prediction</div>
+            <div style={{ color: 'var(--accent)', fontSize: fs(8), fontWeight: 700, marginBottom: 1 }}>94.2% confidence</div>
+            <div style={{ color: 'rgba(var(--accent-rgb),0.32)', fontSize: fs(6) }}>Pre-race prediction</div>
           </div>
         </div>
       </div>
@@ -236,23 +238,23 @@ export default function F1Demo() {
         flexWrap:   'wrap',
         gap:        8,
         padding:    '4px 10px',
-        borderTop:  '1px solid rgba(196,98,45,0.12)',
-        background: '#160f0b',
+        borderTop:  '1px solid rgba(var(--accent-rgb),0.12)',
+        background: 'rgba(236,236,236,0.04)',
         fontSize:   fs(7.5),
-        color:      '#c8b89a',
+        color:      'var(--dim)',
         zIndex:     2,
       }}>
-        <span><span style={{ color: 'rgba(196,98,45,0.42)', marginRight: 3 }}>LEAD</span><span style={{ color: '#e8002d', fontWeight: 700 }}>LEC</span></span>
-        <span style={{ color: 'rgba(196,98,45,0.2)' }}>│</span>
-        <span><span style={{ color: 'rgba(196,98,45,0.42)', marginRight: 3 }}>KM/H</span>{speed}</span>
-        <span style={{ color: 'rgba(196,98,45,0.2)' }}>│</span>
-        <span><span style={{ color: 'rgba(196,98,45,0.42)', marginRight: 3 }}>GAP</span>+{gap2nd}s</span>
-        <span style={{ color: 'rgba(196,98,45,0.2)' }}>│</span>
+        <span><span style={{ color: 'rgba(var(--accent-rgb),0.42)', marginRight: 3 }}>LEAD</span><span style={{ color: '#e8002d', fontWeight: 700 }}>LEC</span></span>
+        <span style={{ color: 'rgba(var(--accent-rgb),0.2)' }}>│</span>
+        <span><span style={{ color: 'rgba(var(--accent-rgb),0.42)', marginRight: 3 }}>KM/H</span>{speed}</span>
+        <span style={{ color: 'rgba(var(--accent-rgb),0.2)' }}>│</span>
+        <span><span style={{ color: 'rgba(var(--accent-rgb),0.42)', marginRight: 3 }}>GAP</span>+{gap2nd}s</span>
+        <span style={{ color: 'rgba(var(--accent-rgb),0.2)' }}>│</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: tireColor, boxShadow: `0 0 4px ${tireColor}`, display: 'inline-block' }} />
-          <span style={{ color: 'rgba(196,98,45,0.42)' }}>{tire}</span>
+          <span style={{ color: 'rgba(var(--accent-rgb),0.42)' }}>{tire}</span>
         </span>
-        <span style={{ color: 'rgba(196,98,45,0.2)' }}>│</span>
+        <span style={{ color: 'rgba(var(--accent-rgb),0.2)' }}>│</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
           <span style={{
             width: 5, height: 5, borderRadius: '50%', display: 'inline-block',
@@ -260,9 +262,9 @@ export default function F1Demo() {
             boxShadow:   drsActive ? '0 0 6px #00ff88' : 'none',
             transition:  'all 0.2s',
           }} />
-          <span style={{ color: drsActive ? '#00ff88' : 'rgba(196,98,45,0.38)', transition: 'color 0.2s' }}>DRS</span>
+          <span style={{ color: drsActive ? '#00ff88' : 'rgba(var(--accent-rgb),0.38)', transition: 'color 0.2s' }}>DRS</span>
         </span>
-        <span style={{ marginLeft: 'auto', color: 'rgba(196,98,45,0.22)', fontSize: fs(6.5) }}>● LIVE SIM</span>
+        <span style={{ marginLeft: 'auto', color: 'rgba(var(--accent-rgb),0.22)', fontSize: fs(6.5) }}>● LIVE SIM</span>
       </div>
     </div>
   )
