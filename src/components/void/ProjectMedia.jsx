@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 /**
- * Media slot for a project row. Four shapes, picked by `media.type`:
+ * Media slot for a project row. Five shapes, picked by `media.type`:
  *
  *   'custom'       — renders the component passed as media.component
  *                    (MacroSetDemo, F1Demo). Sizes itself; no forced ratio.
  *   'live-preview' — Microlink screenshot of a live site, with a pulsing
  *                    skeleton that cross-fades out on load.
+ *   'carousel'     — auto-advancing cross-fade through media.slides, each
+ *                    { src } for a local asset or { url } for a Microlink shot.
  *   'image'        — a static asset from src/assets/projects/.
  *   undefined/null — labelled placeholder.
  *
@@ -37,6 +39,40 @@ function LivePreview({ url, alt, label }) {
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
       />
+    </>
+  )
+}
+
+function Carousel({ slides, interval = 4000, alt, label }) {
+  const [active, setActive] = useState(0)
+  const [failed, setFailed] = useState(() => new Set())
+
+  // A slide whose image errors (e.g. Microlink outage) is dropped from the loop.
+  const visible = slides.map((slide, i) => ({ slide, i })).filter(({ i }) => !failed.has(i))
+
+  useEffect(() => {
+    if (visible.length < 2) return undefined
+    const id = setInterval(() => setActive((a) => a + 1), interval)
+    return () => clearInterval(id)
+  }, [visible.length, interval])
+
+  if (visible.length === 0) return <Placeholder label={label} />
+
+  const current = active % visible.length
+
+  return (
+    <>
+      {visible.map(({ slide, i }, pos) => (
+        <img
+          key={i}
+          className={`v-media-slide ${pos === current ? 'is-active' : ''}`.trim()}
+          src={slide.src || microlinkUrl(slide.url)}
+          alt={pos === current ? alt : ''}
+          aria-hidden={pos === current ? undefined : true}
+          decoding="async"
+          onError={() => setFailed((prev) => new Set(prev).add(i))}
+        />
+      ))}
     </>
   )
 }
@@ -72,6 +108,14 @@ export default function ProjectMedia({ media, accent }) {
     return (
       <div className="v-media v-media--live" style={style}>
         <LivePreview url={media.url} alt={media.alt} label={media.label} />
+      </div>
+    )
+  }
+
+  if (type === 'carousel' && media.slides?.length) {
+    return (
+      <div className="v-media v-media--carousel" style={style}>
+        <Carousel slides={media.slides} interval={media.interval} alt={media.alt} label={media.label} />
       </div>
     )
   }

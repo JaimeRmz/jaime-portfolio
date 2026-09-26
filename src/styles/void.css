@@ -765,6 +765,18 @@
   display: block;
 }
 
+/* carousel — slides stack and cross-fade; only the active one is opaque */
+.v-media-slide {
+  position: absolute;
+  inset: 0;
+  object-position: center !important;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.v-media-slide.is-active {
+  opacity: 1;
+}
+
 /* live-preview skeleton — pulses on the dim/faint ramp until onLoad */
 .v-media-skeleton {
   position: absolute;

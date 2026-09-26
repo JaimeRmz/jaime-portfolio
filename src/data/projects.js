@@ -70,7 +70,7 @@ export const PROJECTS = [
   {
     id: 'p-jrgk',
     idx: '04',
-    title: 'JRGK GK Platform',
+    title: 'JRGK GK Platform — Community',
     kicker: 'Operations platform — 2025',
     meta: 'React · Square API · Vite',
     description:
@@ -80,8 +80,15 @@ export const PROJECTS = [
     href: 'https://jrgkp.com',
     color: 'var(--blue)',
     media: {
-      type: 'live-preview',
-      url: 'https://jrgkp.com',
+      type: 'carousel',
+      slides: [
+        { src: '/JRGKP1.jpeg' },
+        { src: '/JRGKP2.jpeg' },
+        { src: '/JRGKP3.jpeg' },
+        { src: '/JRGKP4.jpeg' },
+        { url: 'https://jrgkp.com' },
+      ],
+      interval: 4000,
       alt: 'JRGK Performance platform — roster and scheduling dashboard',
       label: 'JRGK platform preview',
     },
